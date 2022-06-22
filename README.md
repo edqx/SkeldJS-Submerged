@@ -1,4 +1,4 @@
-## @skeldjs/submerged
+## SkeldJS Submerged
 
 Classes and structures to interact with the [Submerged](https://github.com/SubmergedAmongUs/Submerged/) custom map for Among Us in SkeldJS.
 
