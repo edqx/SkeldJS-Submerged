@@ -1,0 +1,34 @@
+{
+  "name": "skeldjs-submerged",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "types": "./index.ts",
+  "publishConfig": {
+    "types": "./dist/index.d.ts"
+  },
+  "scripts": {
+    "build": "tsc -p ./",
+    "watch": "tsc -w -p ./",
+    "prepack": "yarn build"
+  },
+  "devDependencies": {
+    "@skeldjs/core": "^2.15.31",
+    "@skeldjs/protocol": "^2.15.31",
+    "@types/node": "latest",
+    "ts-node": "latest",
+    "typescript": "latest"
+  },
+  "license": "GPL-3.0-only",
+  "gitHead": "a08b2fe1f52693c6379029a1c5cb37d092a892ff",
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@skeldjs/constant": "^2.15.31",
+    "@skeldjs/events": "^2.15.31",
+    "@skeldjs/util": "^2.15.31"
+  },
+  "workspaces": [
+    "hbplugin-submerged"
+  ]
+}
