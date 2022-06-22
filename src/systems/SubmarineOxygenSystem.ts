@@ -11,25 +11,25 @@ import {
     Hostable
 } from "@skeldjs/core";
 
-export interface SubmargineOxygenSystemData<RoomType extends Hostable = Hostable> {
+export interface SubmarineOxygenSystemData<RoomType extends Hostable = Hostable> {
     countdown: number;
     playersWithMask: Set<PlayerData<RoomType>>;
     doKillCheck: boolean;
 }
 
-export type SubmargineOxygenSystemEvents<RoomType extends Hostable = Hostable> = SystemStatusEvents<RoomType> &
+export type SubmarineOxygenSystemEvents<RoomType extends Hostable = Hostable> = SystemStatusEvents<RoomType> &
     ExtractEventTypes<[]>;
 
 /**
  * Represents a system responsible for handling communication sabotages on The Skeld and Polus.
  *
- * See {@link SubmargineOxygenSystemEvents} for events to listen to.
+ * See {@link SubmarineOxygenSystemEvents} for events to listen to.
  */
-export class SubmargineOxygenSystem<RoomType extends Hostable = Hostable> extends SystemStatus<
-    SubmargineOxygenSystemData<RoomType>,
-    SubmargineOxygenSystemEvents,
+export class SubmarineOxygenSystem<RoomType extends Hostable = Hostable> extends SystemStatus<
+    SubmarineOxygenSystemData<RoomType>,
+    SubmarineOxygenSystemEvents,
     RoomType
-> implements SubmargineOxygenSystemData {
+> implements SubmarineOxygenSystemData {
     static duration = 30;
 
     countdown: number;
@@ -42,7 +42,7 @@ export class SubmargineOxygenSystem<RoomType extends Hostable = Hostable> extend
     constructor(
         ship: InnerShipStatus<RoomType>,
         systemType: SystemType,
-        data?: HazelReader | SubmargineOxygenSystemData<RoomType>
+        data?: HazelReader | SubmarineOxygenSystemData<RoomType>
     ) {
         super(ship, systemType, data);
 
@@ -58,7 +58,7 @@ export class SubmargineOxygenSystem<RoomType extends Hostable = Hostable> extend
         return this.countdown < 10000;
     }
 
-    patch(data: SubmargineOxygenSystemData<RoomType>) {
+    patch(data: SubmarineOxygenSystemData<RoomType>) {
         this.countdown = data.countdown;
         this.playersWithMask = new Set([...data.playersWithMask]);
         this.doKillCheck = data.doKillCheck;
@@ -94,11 +94,11 @@ export class SubmargineOxygenSystem<RoomType extends Hostable = Hostable> extend
     }
 
     async HandleSabotage(player: PlayerData|undefined, rpc: RepairSystemMessage|undefined) {
-        this.countdown = SubmargineOxygenSystem.duration;
+        this.countdown = SubmarineOxygenSystem.duration;
         this.playersWithMask.clear();
     }
 
-    async _repair(player: PlayerData|undefined, rpc: RepairSystemMessage|undefined) {
+    private async _repair(player: PlayerData|undefined, rpc: RepairSystemMessage|undefined) {
         this.countdown = 10000;
         this.playersWithMask.clear();
     }
@@ -107,20 +107,23 @@ export class SubmargineOxygenSystem<RoomType extends Hostable = Hostable> extend
         if (this.room.hostIsMe) {
             await this._repair(this.room.myPlayer, undefined);
         } else {
-            await this._sendRepair(0);
+            await this._sendRepair(16);
         }
     }
 
     async HandleRepair(player: PlayerData<RoomType>|undefined, amount: number, rpc: RepairSystemMessage|undefined) {
-        if (amount === 128) {
-            if (!this.sabotaged) {
-                this.HandleSabotage(player, rpc);
-            }
-        } else if (amount === 64) {
-            if (player)
-                this.playersWithMask.add(player);
-        } else if (amount === 16) {
-            this._repair(player, rpc);
+        switch (amount) {
+            case 128:
+                if (!this.sabotaged)
+                    this.HandleSabotage(player, rpc);
+                break;
+            case 64:
+                if (player)
+                    this.playersWithMask.add(player);
+                break;
+            case 16:
+                this._repair(player, rpc);
+                break;
         }
         this.dirty = true;
     }
